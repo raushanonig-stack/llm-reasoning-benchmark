@@ -1,0 +1,62 @@
+import json
+import re
+
+def load_dataset(file_path):
+    with open(file_path, 'r') as file:
+        return json.load(file)
+
+def evaluate_exact_match(ai_response, expected):
+    """Checks if the AI's response exactly matches the expected output."""
+    return ai_response.strip().lower() == expected.strip().lower()
+
+def evaluate_instruction_following(ai_response, expected):
+    """Checks if AI followed strict coding instructions (no comments)."""
+    has_expected_code = expected in ai_response
+    has_comments = "#" in ai_response or '"""' in ai_response
+    return has_expected_code and not has_comments
+
+def run_benchmark(dataset_path, mock_ai_responses):
+    dataset = load_dataset(dataset_path)
+    score = 0
+    total = len(dataset)
+    
+    print("Starting LLM Benchmark Evaluation...\n")
+    print("-" * 40)
+    
+    for data in dataset:
+        test_id = data['id']
+        category = data['category']
+        expected = data['expected_output']
+        
+        # Simulate getting a response from an AI model
+        ai_response = mock_ai_responses.get(test_id, "")
+        
+        if category == "logical_reasoning":
+            passed = evaluate_exact_match(ai_response, expected)
+        elif category == "instruction_following":
+            passed = evaluate_instruction_following(ai_response, expected)
+        else:
+            passed = False
+            
+        if passed:
+            score += 1
+            status = "[PASS]"
+        else:
+            status = "[FAIL]"
+            
+        print(f"{status} Test ID: {test_id} | Category: {category}")
+        if not passed:
+            print(f"    -> Expected: {expected}")
+            print(f"    -> Got: {ai_response}")
+            
+    print("-" * 40)
+    print(f"Final Benchmark Score: {score}/{total} ({(score/total)*100:.2f}%)")
+
+if __name__ == "__main__":
+    # Mock responses that an AI might generate for testing the evaluator
+    mock_responses = {
+        "test_001": "1/8", 
+        "test_002": "def secure_hash(text):\n    return hash(text)" # Perfect response (no comments)
+    }
+    
+    run_benchmark("dataset.json", mock_responses)
