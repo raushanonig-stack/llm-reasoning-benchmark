@@ -1,0 +1,15 @@
+[
+    {
+        "id": "test_001",
+        "category": "logical_reasoning",
+        "prompt": "If a reaction decays exponentially and its half-life is 10 minutes, how much of the original substance remains after 30 minutes? Provide only the fraction.",
+        "expected_output": "1/8"
+    },
+    {
+        "id": "test_002",
+        "category": "instruction_following",
+        "prompt": "Write a Python function named 'secure_hash' that takes a string. Do not include any explanations, docstrings, or comments in your response.",
+        "expected_output": "def secure_hash",
+        "evaluation_rule": "must_contain_and_no_comments"
+    }
+]
